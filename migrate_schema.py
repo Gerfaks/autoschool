@@ -327,7 +327,8 @@ def migrate_schema():
     """)
 
 
-with app.app_context():
-    migrate_schema()
-    db.session.commit()
-    print('Схема базы данных обновлена')
+if __name__ == '__main__':
+    with app.app_context():
+        migrate_schema()
+        db.session.commit()
+        print('Схема базы данных обновлена')
