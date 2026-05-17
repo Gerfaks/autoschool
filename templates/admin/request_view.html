@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-user"></i> Данные заявителя
+            </div>
+            <div class="card-body">
+                <p><strong>ФИО:</strong> {{ req.fullname }}</p>
+                <p><strong>Телефон:</strong> {{ req.phone }}</p>
+                <p><strong>Email:</strong> {{ req.email or '-' }}</p>
+                <p><strong>Роль:</strong> {{ 'Курсант' if req.role == 'student' else 'Инструктор' }}</p>
+                <p><strong>Дата заявки:</strong> {{ req.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                
+                {% if req.role == 'instructor' %}
+                    <p><strong>Стаж:</strong> {{ req.experience }} лет</p>
+                    <p><strong>Категория прав:</strong> {{ req.license_category }}</p>
+                {% else %}
+                    <p><strong>Категория обучения:</strong> {{ req.category_type }}</p>
+                {% endif %}
+                
+                <p><strong>Паспорт:</strong> {{ req.passport_number }}</p>
+                <p><strong>Водительские права:</strong> {{ req.driver_license_number or '-' }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <i class="fas fa-file-alt"></i> Документы
+            </div>
+            <div class="card-body">
+                {% if req.documents_photo %}
+                    <img src="{{ url_for('uploaded_file', filename=req.documents_photo) }}" class="img-fluid" alt="Документы">
+                {% else %}
+                    <p class="text-muted">Документы не загружены</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if req.status == 'pending' %}
+        <div class="card mt-3">
+            <div class="card-header bg-warning text-dark">
+                <i class="fas fa-gavel"></i> Решение
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/admin/request/{{ req.request_id }}/approve">
+                    <div class="mb-3">
+                        <label>Комментарий (причина отказа)</label>
+                        <textarea name="comment" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button type="submit" name="action" value="approve" class="btn btn-success">✅ Одобрить</button>
+                    <button type="submit" name="action" value="reject" class="btn btn-danger">❌ Отклонить</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="card mt-3">
+            <div class="card-header bg-secondary text-white">
+                <i class="fas fa-check-circle"></i> Решение принято
+            </div>
+            <div class="card-body">
+	                <p><strong>Статус:</strong> {{ 'Одобрено' if req.status == 'approved' else 'Отклонено' }}</p>
+	                <p><strong>Кем:</strong> {{ req.reviewer.username if req.reviewer else '-' }}</p>
+	                <p><strong>Дата:</strong> {{ req.reviewed_at.strftime('%d.%m.%Y %H:%M') if req.reviewed_at else '-' }}</p>
+	                {% if req.status == 'approved' %}
+	                    <div class="alert alert-success">
+	                        <h6 class="mb-2"><i class="fas fa-key"></i> Данные для входа</h6>
+	                        <p class="mb-1"><strong>Логин:</strong> {{ req.login_username or (account_user.username if account_user else 'Не найден') }}</p>
+	                        {% if req.temporary_password %}
+	                            <p class="mb-2"><strong>Временный пароль:</strong> {{ req.temporary_password }}</p>
+	                        {% else %}
+	                            <p class="mb-2 text-muted">Пароль для этой заявки не сохранен. Сбросьте его, чтобы выдать новый временный пароль.</p>
+	                        {% endif %}
+	                        <form method="POST" action="/admin/request/{{ req.request_id }}/reset-password">
+	                            <button type="submit" class="btn btn-sm btn-outline-success" onclick="return confirm('Выдать новый временный пароль? Старый пароль перестанет подходить.')">
+	                                <i class="fas fa-sync-alt"></i> Сбросить временный пароль
+	                            </button>
+	                        </form>
+	                    </div>
+	                {% endif %}
+	                {% if req.comment %}<p><strong>Комментарий:</strong> {{ req.comment }}</p>{% endif %}
+	            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<div class="mt-3">
+    <a href="/admin/requests" class="btn btn-secondary">← Назад к заявкам</a>
+</div>
+{% endblock %}

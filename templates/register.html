@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Регистрация - Автошкола</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 50px 0; }
+        .card { border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+    </style>
+</head>
+	<body>
+	    {% set form_data = form_data|default({}) %}
+	    {% set selected_role = form_data.get('role', '') %}
+	    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body p-4">
+                        <h2 class="text-center mb-4"><i class="fas fa-user-plus"></i> Регистрация</h2>
+                        
+	                        {% with messages = get_flashed_messages(with_categories=true) %}
+	                            {% for category, msg in messages %}
+	                                {% if category == 'danger' %}
+	                                    {% set alert_class = 'danger' %}
+	                                {% elif category == 'success' %}
+	                                    {% set alert_class = 'success' %}
+	                                {% else %}
+	                                    {% set alert_class = 'info' %}
+	                                {% endif %}
+	                                <div class="alert alert-{{ alert_class }}">{{ msg }}</div>
+	                            {% endfor %}
+	                        {% endwith %}
+                        
+                        <form method="POST" action="/register" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label>ФИО</label>
+	                                        <input type="text" name="fullname" class="form-control" value="{{ form_data.get('fullname', '') }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label>Телефон</label>
+	                                        <input type="tel" name="phone" class="form-control" value="{{ form_data.get('phone', '') }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label>Email</label>
+	                                <input type="email" name="email" class="form-control" value="{{ form_data.get('email', '') }}">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label>Я хочу зарегистрироваться как</label>
+                                <select name="role" id="role" class="form-control" required>
+	                                    <option value="">-- Выберите --</option>
+	                                    {% if selected_role == 'student' %}
+	                                        <option value="student" selected>Курсант</option>
+	                                    {% else %}
+	                                        <option value="student">Курсант</option>
+	                                    {% endif %}
+	                                    {% if selected_role == 'instructor' %}
+	                                        <option value="instructor" selected>Инструктор</option>
+	                                    {% else %}
+	                                        <option value="instructor">Инструктор</option>
+	                                    {% endif %}
+	                                </select>
+	                            </div>
+	                            
+	                            {% if selected_role == 'student' %}
+	                            <div id="student_fields">
+	                            {% else %}
+	                            <div id="student_fields" style="display:none;">
+	                            {% endif %}
+	                                <div class="mb-3">
+	                                    <label>Категория обучения (A/B/C)</label>
+	                                    <select name="category_type" class="form-control">
+	                                        {% set selected_category = form_data.get('category_type', 'B') %}
+	                                        {% if selected_category == 'A' %}
+	                                            <option value="A" selected>A - Мотоцикл</option>
+	                                        {% else %}
+	                                            <option value="A">A - Мотоцикл</option>
+	                                        {% endif %}
+	                                        {% if selected_category == 'B' %}
+	                                            <option value="B" selected>B - Легковой</option>
+	                                        {% else %}
+	                                            <option value="B">B - Легковой</option>
+	                                        {% endif %}
+	                                        {% if selected_category == 'C' %}
+	                                            <option value="C" selected>C - Грузовой</option>
+	                                        {% else %}
+	                                            <option value="C">C - Грузовой</option>
+	                                        {% endif %}
+	                                    </select>
+	                                </div>
+	                            </div>
+	                            
+	                            {% if selected_role == 'instructor' %}
+	                            <div id="instructor_fields">
+	                            {% else %}
+	                            <div id="instructor_fields" style="display:none;">
+	                            {% endif %}
+	                                <div class="row">
+	                                    <div class="col-md-6">
+	                                        <div class="mb-3">
+	                                            <label>Стаж (лет)</label>
+	                                            <input type="number" name="experience" class="form-control" min="0" step="1" value="{{ form_data.get('experience', '') }}">
+	                                            <small class="text-muted">Введите целое число, например 3</small>
+	                                        </div>
+	                                    </div>
+	                                    <div class="col-md-6">
+	                                        <div class="mb-3">
+	                                            <label>Категория прав</label>
+	                                            <input type="text" name="license_category" class="form-control" placeholder="A, B, C" value="{{ form_data.get('license_category', '') }}">
+	                                        </div>
+	                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label>Паспорт (серия/номер)</label>
+	                                        <input type="text" name="passport_number" class="form-control" placeholder="1234 567890" value="{{ form_data.get('passport_number', '') }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label>Водительское удостоверение (если есть)</label>
+	                                        <input type="text" name="driver_license_number" class="form-control" placeholder="12 34 567890" value="{{ form_data.get('driver_license_number', '') }}">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label>Фото документов (паспорт, права)</label>
+                                <input type="file" name="documents" class="form-control" accept="image/*">
+                                <small class="text-muted">Загрузите фото паспорта и водительского удостоверения</small>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100">Отправить заявку</button>
+                        </form>
+                        <hr>
+                        <p class="text-center">Уже есть аккаунт? <a href="/login">Войти</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('role').addEventListener('change', function() {
+            var studentFields = document.getElementById('student_fields');
+            var instructorFields = document.getElementById('instructor_fields');
+            
+            if (this.value === 'student') {
+                studentFields.style.display = 'block';
+                instructorFields.style.display = 'none';
+            } else if (this.value === 'instructor') {
+                studentFields.style.display = 'none';
+                instructorFields.style.display = 'block';
+            } else {
+                studentFields.style.display = 'none';
+                instructorFields.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

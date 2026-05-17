@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+    <h4><i class="fas fa-map-marker-alt"></i> Площадки</h4>
+    <a href="/admin/ground/add" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Добавить площадку
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Инструктор</th>
+                <th>Адрес</th>
+                <th>Покрытие</th>
+                <th>Площадь</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for g in grounds %}
+            <tr>
+                <td>{{ g.ground_id }}</td>
+                <td>{{ g.instructor.fullname if g.instructor else 'Не назначен' }}</td>
+                <td>{{ g.address or '-' }}</td>
+                <td>{{ g.surface_type or '-' }}</td>
+                <td>{{ (g.area ~ ' м²') if g.area else '-' }}</td>
+                <td>
+                    <a href="/admin/ground/edit/{{ g.ground_id }}" class="btn btn-sm btn-warning">
+                        <i class="fas fa-pen"></i> Изменить
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6">Площадки еще не добавлены</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

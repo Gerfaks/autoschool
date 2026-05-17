@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Автошкола - {{ title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+        .sidebar { width: 260px; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; position: fixed; height: 100vh; left: 0; top: 0; padding: 20px 0; overflow-y: auto; }
+        .sidebar h3 { padding: 0 25px 20px 25px; font-size: 1.3rem; }
+        .sidebar .user-info { padding: 20px 25px; background: rgba(255,255,255,0.05); margin: 15px; border-radius: 12px; text-align: center; }
+        .sidebar .user-info i { font-size: 50px; margin-bottom: 10px; }
+        .sidebar .nav-link { color: rgba(255,255,255,0.8); padding: 12px 25px; display: flex; align-items: center; gap: 12px; text-decoration: none; transition: all 0.3s; }
+        .sidebar .nav-link:hover { background: rgba(255,255,255,0.1); color: white; padding-left: 30px; }
+        .sidebar .nav-link.active { background: linear-gradient(90deg, #e94560, #ff6b6b); color: white; }
+        .main-content { margin-left: 260px; padding: 20px; min-height: 100vh; }
+        .top-bar { background: white; border-radius: 15px; padding: 15px 25px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .card { border: none; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: transform 0.2s; margin-bottom: 20px; }
+        .card:hover { transform: translateY(-3px); }
+        .stat-card { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-gradient { background: linear-gradient(90deg, #e94560, #ff6b6b); border: none; color: white; padding: 8px 20px; border-radius: 10px; text-decoration: none; display: inline-block; }
+        .btn-gradient:hover { transform: scale(1.02); color: white; }
+	        .table { background: white; border-radius: 15px; overflow: hidden; }
+	        .table thead { background: #1a1a2e; color: white; }
+	        .alert { border-radius: 12px; }
+	        .car-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+	        .car-tile { background: white; border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 12px; overflow: hidden; box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08); transition: transform 0.2s, box-shadow 0.2s; }
+	        .car-tile:hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12); }
+	        .car-tile-body { padding: 15px; }
+	        .car-title { color: #172033; font-size: 1.08rem; font-weight: 700; line-height: 1.25; }
+	        .car-subtitle { color: #667085; font-size: 0.9rem; }
+	        .car-details { display: grid; gap: 8px; margin-top: 12px; color: #475467; font-size: 0.94rem; }
+	        .car-detail-line { display: flex; align-items: center; gap: 8px; min-width: 0; }
+	        .car-detail-line i { width: 18px; color: #667085; text-align: center; }
+	        .car-detail-line span { min-width: 0; overflow-wrap: anywhere; }
+	        .car-plate { display: inline-flex; align-items: center; width: fit-content; max-width: 100%; padding: 3px 9px; border: 1px solid #d0d5dd; border-radius: 6px; background: #f8fafc; color: #111827; font-weight: 700; letter-spacing: 0.08em; }
+	        .car-actions { display: flex; gap: 8px; margin-top: 14px; }
+	        .car-actions .btn { flex: 1; white-space: nowrap; }
+	        .car-image-frame { position: relative; display: block; width: 100%; overflow: hidden; border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 12px; background: #eef2f7; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8); }
+	        .car-tile .car-image-frame { border: 0; border-radius: 0; box-shadow: none; }
+	        .car-image-card { aspect-ratio: 16 / 10; }
+	        .car-image-form { aspect-ratio: 16 / 9; min-height: 210px; max-height: 340px; }
+	        .car-image-booking { aspect-ratio: 16 / 9; min-height: 190px; max-height: 300px; margin-top: 10px; }
+	        .car-image { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 0.25s; }
+	        .car-image-frame:hover .car-image { transform: scale(1.03); }
+	        .car-image-placeholder { display: flex; width: 100%; height: 100%; min-height: inherit; align-items: center; justify-content: center; flex-direction: column; gap: 8px; color: #667085; background: linear-gradient(135deg, #eef2f7, #ffffff); text-align: center; padding: 18px; }
+	        .car-image-placeholder i { color: #98a2b3; font-size: 2.25rem; }
+	        .car-preview-panel { border: 1px solid #e4e7ec; border-radius: 12px; background: #f8fafc; padding: 12px; }
+	        .car-preview-title { color: #172033; font-weight: 700; }
+	        .empty-state { border: 1px dashed #cbd5e1; border-radius: 12px; background: white; color: #667085; padding: 32px; text-align: center; }
+	        @media (max-width: 767px) {
+	            .main-content { margin-left: 0; padding: 12px; }
+	            .sidebar { position: static; width: 100%; height: auto; }
+	            .top-bar { align-items: flex-start; gap: 8px; flex-direction: column; }
+	            .car-gallery { grid-template-columns: 1fr; }
+	            .car-actions { flex-direction: column; }
+	        }
+	    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<div class="sidebar">
+    <h3><i class="fas fa-car"></i> Автошкола</h3>
+    <div class="user-info">
+        <i class="fas fa-user-circle"></i>
+        <h5>{{ user_name }}</h5>
+        <span class="badge bg-{{ 'danger' if role == 'admin' else 'primary' if role == 'instructor' else 'success' }}">
+            {{ 'Админ' if role == 'admin' else 'Инструктор' if role == 'instructor' else 'Курсант' }}
+        </span>
+    </div>
+    <nav class="nav flex-column">
+        {% for item in menu_items %}
+            <a href="{{ item.url }}" class="nav-link {% if item.active %}active{% endif %}">
+                <i class="{{ item.icon }}"></i> {{ item.name }}
+            </a>
+        {% endfor %}
+        <a href="/logout" class="nav-link"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+    </nav>
+</div>
+<div class="main-content">
+    <div class="top-bar">
+        <h4 class="mb-0">{{ title }}</h4>
+        <div><i class="fas fa-calendar-alt"></i> {{ today }}</div>
+    </div>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="alert alert-success alert-dismissible fade show">{{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    {% block content %}{% endblock %}
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+	    document.querySelectorAll('[data-car-photo-input]').forEach(function(input) {
+	        input.addEventListener('change', function() {
+	            var file = input.files && input.files[0];
+	            var preview = document.querySelector(input.dataset.previewTarget);
+	            var placeholder = document.querySelector(input.dataset.placeholderTarget);
+	
+	            if (!file || !preview) {
+	                return;
+	            }
+	
+	            var reader = new FileReader();
+	            reader.onload = function(event) {
+	                preview.src = event.target.result;
+	                preview.classList.remove('d-none');
+	                if (placeholder) {
+	                    placeholder.classList.add('d-none');
+	                }
+	            };
+	            reader.readAsDataURL(file);
+	        });
+	    });
+	</script>
+	{% block extra_js %}{% endblock %}
+	</body>
+	</html>

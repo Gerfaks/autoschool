@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-3 mb-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h2>{{ students_count }}</h2>
+                <p>Курсантов</p>
+                <i class="fas fa-users" style="position: absolute; right: 20px; top: 20px; font-size: 30px; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h2>{{ instructors_count }}</h2>
+                <p>Инструкторов</p>
+                <i class="fas fa-chalkboard-user" style="position: absolute; right: 20px; top: 20px; font-size: 30px; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h2>{{ cars_count }}</h2>
+                <p>Автомобилей</p>
+                <i class="fas fa-car" style="position: absolute; right: 20px; top: 20px; font-size: 30px; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+	    <div class="col-md-3 mb-3">
+	        <div class="card bg-info text-white">
+	            <div class="card-body">
+	                <h2>{{ lessons_count }}</h2>
+	                <p>Проведенных занятий</p>
+	                <i class="fas fa-calendar" style="position: absolute; right: 20px; top: 20px; font-size: 30px; opacity: 0.3;"></i>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h2>{{ month_revenue|round(0) }} руб.</h2>
+                <p>Выручка за месяц {{ month_title }}</p>
+                <i class="fas fa-ruble-sign" style="position: absolute; right: 20px; top: 20px; font-size: 30px; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card bg-secondary text-white">
+            <div class="card-body">
+                <h2>{{ month_completed_lessons }}</h2>
+                <p>Проведенных занятий за месяц {{ month_title }}</p>
+                <i class="fas fa-check-circle" style="position: absolute; right: 20px; top: 20px; font-size: 30px; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+		            <div class="card-header">📊 Проведенные занятия за месяц {{ month_title }}</div>
+            <div class="card-body">
+                <canvas id="lessonsChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card">
+	            <div class="card-header">💰 Выручка за месяц {{ month_title }} (руб.)</div>
+            <div class="card-body">
+                <canvas id="financeChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">⚠️ Должники</div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr><th>Курсант</th><th>Задолженность (руб.)</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for d in debtors %}
+                        <tr>
+                            <td>{{ d.name }}</td>
+                            <td class="text-danger">{{ d.debt|round(0) }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="2">Нет должников</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="application/json" id="month-labels-data">{{ month_labels|tojson|safe }}</script>
+<script type="application/json" id="lessons-data">{{ lessons_by_day|tojson|safe }}</script>
+<script type="application/json" id="payments-data">{{ payments_by_day|tojson|safe }}</script>
+
+<script>
+    var monthLabels = JSON.parse(document.getElementById("month-labels-data").textContent);
+    var lessonsData = JSON.parse(document.getElementById("lessons-data").textContent);
+    var paymentsData = JSON.parse(document.getElementById("payments-data").textContent);
+
+    new Chart(document.getElementById("lessonsChart"), {
+        type: "bar",
+        data: {
+	            labels: monthLabels,
+            datasets: [{
+	                label: "Проведенные занятия",
+                data: lessonsData,
+                backgroundColor: "#667eea"
+            }]
+        }
+    });
+
+    new Chart(document.getElementById("financeChart"), {
+        type: "line",
+        data: {
+	            labels: monthLabels,
+            datasets: [{
+                label: "Выручка (руб.)",
+                data: paymentsData,
+                borderColor: "#e94560",
+                tension: 0.3,
+                fill: true,
+                backgroundColor: "rgba(233,69,96,0.1)"
+            }]
+        }
+    });
+</script>
+{% endblock %}

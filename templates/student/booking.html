@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-calendar-plus"></i> Запись на занятие
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/student/booking" id="bookingForm">
+                    <div class="mb-3">
+                        <label>Выберите инструктора</label>
+	                        <select name="instructor_id" id="instructor_select" class="form-control" required>
+	                            <option value="">-- Выберите инструктора --</option>
+	                            {% for i in instructors %}
+                                {% set car = instructor_cars.get(i.instructor_id) %}
+	                            <option
+	                                    value="{{ i.instructor_id }}"
+	                                    data-car="{{ (car.brand ~ ' ' ~ car.model ~ ', ' ~ car.plate) if car else 'Автомобиль не указан' }}"
+	                                    data-photo="{{ url_for('uploaded_file', filename=car.photo_filename) if car and car.photo_filename else '' }}"
+	                                    data-location="{{ instructor_lesson_locations.get(i.instructor_id|string, lesson_locations).get('Вождение', 'Место уточнит администратор') }}"
+	                                >
+                                    {{ i.fullname }} (стаж: {{ i.experience }} лет)
+                                </option>
+	                            {% endfor %}
+	                        </select>
+	                    </div>
+                        <div id="car_info" class="mb-3 d-none">
+                            <label>Автомобиль инструктора</label>
+                            <div class="car-preview-panel">
+                                <div id="car_text" class="car-preview-title"></div>
+                                <div class="car-image-frame car-image-booking">
+                                    <img id="car_photo" src="" alt="Фото автомобиля" class="car-image d-none">
+                                    <div id="car_photo_placeholder" class="car-image-placeholder">
+                                        <i class="fas fa-car-side"></i>
+                                        <span>Нет фото</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+	                    <div class="mb-3">
+                        <label>Выберите свободное время</label>
+                        <select name="schedule_id" id="schedule_select" class="form-control" required>
+                            <option value="">-- Сначала выберите инструктора --</option>
+                        </select>
+                    </div>
+	                    <div class="mb-3">
+	                        <label>Тип занятия</label>
+	                        <select name="lesson_type" id="lesson_type_select" class="form-control">
+	                            <option>Теория</option>
+	                            <option>Вождение</option>
+	                            <option>Площадка</option>
+	                        </select>
+	                    </div>
+                        <div class="mb-3">
+                            <label>Куда прийти</label>
+                            <div id="lesson_location" class="border rounded p-3 bg-light fw-semibold"></div>
+                        </div>
+                    <div class="mb-3">
+                        <label>Комментарий (пожелания)</label>
+                        <textarea name="comments" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Отправить заявку</button>
+                    <a href="/student" class="btn btn-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="application/json" id="lesson_locations_data">{{ lesson_locations|tojson }}</script>
+<script type="application/json" id="instructor_lesson_locations_data">{{ instructor_lesson_locations|tojson }}</script>
+
+<script>
+    document.getElementById('instructor_select').addEventListener('change', function() {
+        var instructorId = this.value;
+        var scheduleSelect = document.getElementById('schedule_select');
+        var selectedOption = this.options[this.selectedIndex];
+        var carInfo = document.getElementById('car_info');
+        var carText = document.getElementById('car_text');
+        var carPhoto = document.getElementById('car_photo');
+        var carPhotoPlaceholder = document.getElementById('car_photo_placeholder');
+
+        if (instructorId && selectedOption) {
+            carText.textContent = selectedOption.dataset.car || 'Автомобиль не указан';
+            if (selectedOption.dataset.photo) {
+                carPhoto.src = selectedOption.dataset.photo;
+                carPhoto.classList.remove('d-none');
+                carPhotoPlaceholder.classList.add('d-none');
+            } else {
+                carPhoto.src = '';
+                carPhoto.classList.add('d-none');
+                carPhotoPlaceholder.classList.remove('d-none');
+            }
+            carInfo.classList.remove('d-none');
+        } else {
+            carInfo.classList.add('d-none');
+            carText.textContent = '';
+            carPhoto.src = '';
+            carPhoto.classList.add('d-none');
+            carPhotoPlaceholder.classList.remove('d-none');
+        }
+        
+        if (instructorId && instructorId != "") {
+            scheduleSelect.innerHTML = '<option value="">Загрузка...</option>';
+            
+            fetch('/student/get_slots/' + instructorId)
+                .then(response => response.json())
+                .then(data => {
+                    scheduleSelect.innerHTML = '<option value="">-- Выберите время --</option>';
+	                    
+                    if (data.length === 0) {
+                        scheduleSelect.innerHTML = '<option value="">Нет свободных слотов</option>';
+                    } else {
+                        data.forEach(function(slot) {
+                            var option = document.createElement('option');
+                            option.value = slot.schedule_id;
+                            option.textContent = slot.lesson_date + ' ' + slot.lesson_time;
+                            scheduleSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Ошибка:", error);
+                    scheduleSelect.innerHTML = '<option value="">Ошибка загрузки</option>';
+                });
+        } else {
+            scheduleSelect.innerHTML = '<option value="">-- Сначала выберите инструктора --</option>';
+        }
+    });
+
+    var lessonLocations = JSON.parse(document.getElementById('lesson_locations_data').textContent);
+    var instructorLessonLocations = JSON.parse(document.getElementById('instructor_lesson_locations_data').textContent);
+    var instructorSelect = document.getElementById('instructor_select');
+    var lessonTypeSelect = document.getElementById('lesson_type_select');
+    var lessonLocation = document.getElementById('lesson_location');
+
+    function updateLessonLocation() {
+        if (!instructorSelect.value && lessonTypeSelect.value !== 'Теория') {
+            lessonLocation.textContent = 'Сначала выберите инструктора';
+            return;
+        }
+
+        var instructorLocations = instructorLessonLocations[instructorSelect.value] || lessonLocations;
+        lessonLocation.textContent = instructorLocations[lessonTypeSelect.value] || 'Место уточнит администратор';
+    }
+
+    instructorSelect.addEventListener('change', updateLessonLocation);
+    lessonTypeSelect.addEventListener('change', updateLessonLocation);
+    updateLessonLocation();
+</script>
+{% endblock %}

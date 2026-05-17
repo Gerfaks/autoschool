@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white">📅 Мои занятия</div>
+    <div class="card-body">
+        {% if lessons %}
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Дата</th>
+                            <th>Время</th>
+	                            <th>Курсант</th>
+                                <th>Телефон курсанта</th>
+	                            <th>Тип</th>
+                                <th>Куда прийти</th>
+	                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for l in lessons %}
+                        <tr class="{% if l.status == 'completed' %}table-success{% elif l.status == 'cancelled' %}table-danger{% endif %}">
+                            <td>{{ l.lesson_date }}</td>
+	                            <td>{{ l.lesson_time }}</td>
+	                            <td>{{ l.kursant_name }}</td>
+                                <td>{{ l.kursant_phone or '-' }}</td>
+	                            <td>{{ l.lesson_type }}</td>
+	                                <td>{{ lesson_locations.get(l.lesson_id, 'Место уточнит администратор') }}</td>
+	                            <td>
+	                                {% if l.status == 'completed' %}
+	                                    <span class="badge bg-success">✅ Проведено</span>
+	                                {% elif l.status == 'cancelled' %}
+	                                    <span class="badge bg-danger">❌ Отменено</span>
+                                    {% elif l.status == 'confirmed' %}
+                                        <span class="badge bg-primary">✅ Подтверждено</span>
+	                                {% else %}
+	                                    <span class="badge bg-warning">⏳ Ждет подтверждения</span>
+	                                {% endif %}
+	                            </td>
+	                            <td>
+	                                {% if l.status == 'pending' %}
+	                                    <div class="btn-group" role="group">
+                                            <form method="POST" action="/instructor/lesson/confirm/{{ l.lesson_id }}" onsubmit="return confirm('Подтвердить занятие?')">
+                                                <button type="submit" class="btn btn-sm btn-primary">✅ Подтвердить</button>
+                                            </form>
+                                            <form method="POST" action="/instructor/lesson/cancel/{{ l.lesson_id }}" onsubmit="return confirm('Отменить занятие?')">
+                                                <button type="submit" class="btn btn-sm btn-danger">❌ Отменить</button>
+                                            </form>
+	                                    </div>
+                                    {% elif l.status == 'confirmed' %}
+                                        <div class="btn-group" role="group">
+                                            <form method="POST" action="/instructor/lesson/complete/{{ l.lesson_id }}" onsubmit="return confirm('Отметить как проведенное?')">
+                                                <button type="submit" class="btn btn-sm btn-success">✅ Проведено</button>
+                                            </form>
+                                            <form method="POST" action="/instructor/lesson/cancel/{{ l.lesson_id }}" onsubmit="return confirm('Отменить занятие?')">
+                                                <button type="submit" class="btn btn-sm btn-danger">❌ Отменить</button>
+                                            </form>
+                                        </div>
+	                                {% elif l.status == 'completed' %}
+	                                    <span class="text-success">Проведено</span>
+                                {% else %}
+                                    <span class="text-danger">Отменено</span>
+                                {% endif %}
+                             </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted">У вас нет предстоящих занятий</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

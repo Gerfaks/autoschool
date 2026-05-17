@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">{{ title }}</div>
+            <div class="card-body">
+                <form method="POST">
+	                    <div class="mb-3">
+	                        <label>ФИО</label>
+	                        <input type="text" name="fullname" class="form-control" value="{{ instructor.fullname if instructor else '' }}" required>
+	                    </div>
+                        <div class="mb-3">
+                            <label>Телефон</label>
+                            <input type="text" name="phone" class="form-control" value="{{ instructor.phone if instructor else '' }}">
+                        </div>
+	                    <div class="mb-3">
+                        <label>Стаж (лет)</label>
+                        <input type="number" name="experience" class="form-control" value="{{ instructor.experience if instructor else '0' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label>Категория прав</label>
+                        <input type="text" name="license_category" class="form-control" value="{{ instructor.license_category if instructor else '' }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <a href="/admin/instructors" class="btn btn-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

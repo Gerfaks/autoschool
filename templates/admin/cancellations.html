@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <div class="card-header bg-danger text-white">
+        <i class="fas fa-ban"></i> История отмен
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Когда отменили</th>
+                        <th>Кто отменил</th>
+                        <th>Дата занятия</th>
+                        <th>Время</th>
+                        <th>Тип</th>
+                        <th>Курсант</th>
+                        <th>Инструктор</th>
+                        <th>Причина</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in cancellations %}
+                    <tr>
+                        <td>{{ c.cancelled_at.strftime('%d.%m.%Y %H:%M') if c.cancelled_at else '-' }}</td>
+                        <td>{{ 'Курсант' if c.cancelled_by_role == 'student' else 'Инструктор' }}: {{ c.cancelled_by_name or '-' }}</td>
+                        <td>{{ c.lesson_date }}</td>
+                        <td>{{ c.lesson_time }}</td>
+                        <td>{{ c.lesson_type }}</td>
+                        <td>{{ c.student_name or '-' }}</td>
+                        <td>{{ c.instructor_name or '-' }}</td>
+                        <td>{{ c.reason or '-' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="8">Отмен пока нет</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

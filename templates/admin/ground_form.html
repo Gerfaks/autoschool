@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">{{ title }}</div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label>Инструктор</label>
+                        <select name="instructor_id" class="form-control">
+                            <option value="">Не назначен</option>
+                            {% for instructor in instructors %}
+                                {% if ground and ground.instructor_id == instructor.instructor_id %}
+                                    <option value="{{ instructor.instructor_id }}" selected>{{ instructor.fullname }}</option>
+                                {% else %}
+                                    <option value="{{ instructor.instructor_id }}">{{ instructor.fullname }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Адрес</label>
+                        <input type="text" name="address" class="form-control" value="{{ ground.address if ground else '' }}" placeholder="ул. Лесная, 12" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Тип покрытия</label>
+                        <input type="text" name="surface_type" class="form-control" value="{{ ground.surface_type if ground else '' }}" placeholder="асфальт">
+                    </div>
+                    <div class="mb-3">
+                        <label>Площадь, м²</label>
+                        <input type="number" name="area" class="form-control" min="1" step="1" value="{{ ground.area_text if ground and ground.area_text is defined else ground.area if ground and ground.area else '' }}" placeholder="1200">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <a href="/admin/grounds" class="btn btn-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

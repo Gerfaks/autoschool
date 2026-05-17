@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-tags"></i> Тарифы занятий
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Тип занятия</th>
+                                <th>Цена, руб.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tariff in tariffs %}
+                            <tr>
+                                <td>{{ tariff.lesson_type.name }}</td>
+                                <td>
+                                    <input type="number" name="price_{{ tariff.tariff_id }}" class="form-control" value="{{ tariff.price }}" step="50" min="0" required>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

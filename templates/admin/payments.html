@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-plus-circle"></i> Внести оплату
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/admin/payment/add">
+                    <div class="mb-3">
+                        <label>Курсант</label>
+                        <select name="kursant_id" class="form-control" required>
+                        <option value="">-- Выберите курсанта --</option>
+                        {% for s in students %}
+                        <option value="{{ s.kursant_id }}">{{ s.name }} (Долг: {{ s.debt }} руб.)</option>
+                        {% endfor %}
+                    </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Сумма (руб.)</label>
+                        <input type="number" name="amount" class="form-control" step="100" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Способ оплаты</label>
+                        <select name="payment_method" class="form-control">
+                            <option>Наличные</option>
+                            <option>Карта</option>
+                            <option>Перевод</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Комментарий</label>
+                        <textarea name="comment" class="form-control" rows="2"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">💳 Внести оплату</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8 mb-3">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <i class="fas fa-history"></i> История платежей
+            </div>
+            <div class="card-body">
+                <form method="GET" class="row g-2 mb-3">
+                    <div class="col-md-3">
+                        <select name="student_id" class="form-control">
+                            <option value="">Все курсанты</option>
+                            {% for s in students %}
+                                <option value="{{ s.kursant_id }}" {% if filters.student_id|string == s.kursant_id|string %}selected{% endif %}>{{ s.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="payment_method" class="form-control">
+                            <option value="">Все способы</option>
+                            <option {% if filters.payment_method == 'Наличные' %}selected{% endif %}>Наличные</option>
+                            <option {% if filters.payment_method == 'Карта' %}selected{% endif %}>Карта</option>
+                            <option {% if filters.payment_method == 'Перевод' %}selected{% endif %}>Перевод</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" name="date_from" class="form-control" value="{{ filters.date_from }}">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" name="date_to" class="form-control" value="{{ filters.date_to }}">
+                    </div>
+                    <div class="col-md-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Фильтр</button>
+                        <a href="/admin/payments" class="btn btn-secondary">Сброс</a>
+                    </div>
+                </form>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Дата</th>
+                                <th>Курсант</th>
+                                <th>Сумма</th>
+                                <th>Способ</th>
+                                <th>Комментарий</th>
+                                <th>Админ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in payments %}
+                            <tr>
+                                <td>{{ p.payment_date }}</td>
+                                <td>{{ p.student_name }}</td>
+                                <td>{{ p.amount }} руб.</td>
+                                <td>{{ p.payment_method }}</td>
+                                <td>{{ p.comment or '-' }}</td>
+                                <td>{{ p.created_by or '-' }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="6">Нет платежей</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <i class="fas fa-exclamation-triangle"></i> Задолженности
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Курсант</th>
+                                <th>Проведено занятий</th>
+                                <th>Должно быть (руб.)</th>
+                                <th>Оплачено (руб.)</th>
+                                <th>Задолженность (руб.)</th>
+                                <th>Действие</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in debtors %}
+                            <tr class="{% if d.debt > 0 %}table-danger{% else %}table-success{% endif %}">
+                                <td>{{ d.name }}</td>
+                                <td>{{ d.lessons_count }}</td>
+                                <td>{{ d.expected }}</td>
+                                <td>{{ d.paid }}</td>
+                                <td><b>{{ d.debt }}</b></td>
+	                                <td>
+	                                    {% if d.debt > 0 %}
+	                                        <form method="POST" action="/admin/payment/remind/{{ d.id }}" class="d-inline">
+	                                            <button type="submit" class="btn btn-sm btn-warning">📢 Напомнить</button>
+	                                        </form>
+	                                    {% else %}
+                                        ✅
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="6">Нет данных</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

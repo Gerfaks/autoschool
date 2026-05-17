@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-3">
+        <a href="/student/booking" class="btn btn-primary btn-lg w-100">
+            <i class="fas fa-calendar-plus"></i> Записаться на занятие
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">📅 Мои занятия</div>
+            <div class="card-body">
+                {% if lessons %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Время</th>
+                                    <th>Тип</th>
+                                    <th>Куда прийти</th>
+                                    <th>Инструктор</th>
+                                    <th>Телефон инструктора</th>
+                                    <th>Статус</th>
+                                    <th>Действие</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for l in lessons %}
+                                <tr class="{% if l.status == 'completed' %}table-success{% elif l.status == 'cancelled' %}table-danger{% endif %}">
+                                    <td>{{ l.lesson_date }}</td>
+                                    <td>{{ l.lesson_time }}</td>
+                                    <td>{{ l.lesson_type }}</td>
+	                                    <td>{{ lesson_locations.get(l.lesson_id, 'Место уточнит администратор') }}</td>
+                                    <td>{{ l.instructor_name }}</td>
+                                    <td>{{ l.instructor_phone or '-' }}</td>
+                                    <td>
+                                        {% if l.status == 'completed' %}
+                                            <span class="badge bg-success">✅ Проведено</span>
+                                        {% elif l.status == 'cancelled' %}
+                                            <span class="badge bg-danger">❌ Отменено</span>
+                                        {% elif l.status == 'confirmed' %}
+                                            <span class="badge bg-primary">✅ Подтверждено</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">⏳ Ждет подтверждения</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if l.status in ['pending', 'confirmed'] %}
+                                            <form method="POST" action="/student/lesson/cancel/{{ l.lesson_id }}" onsubmit="return confirm('Отменить запись на занятие?')">
+                                                <button type="submit" class="btn btn-sm btn-danger text-nowrap">❌ Отменить</button>
+                                            </form>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">Нет занятий</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <i class="fas fa-ruble-sign"></i> Моя задолженность
+            </div>
+            <div class="card-body">
+                <h3 class="text-center">
+                    {% if debt > 0 %}
+                        <span class="text-danger">{{ debt }} руб.</span>
+                    {% else %}
+                        <span class="text-success">Нет задолженности ✅</span>
+                    {% endif %}
+                </h3>
+                <p class="text-muted text-center">Занятий проведено: {{ lessons_count }}</p>
+                <p class="text-muted text-center">Оплачено: {{ paid }} руб.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        {% if payments %}
+        <div class="card mt-3 mt-md-0">
+            <div class="card-header bg-success text-white">💰 История оплат</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-dark">
+                            <tr><th>Дата</th><th>Сумма</th><th>Способ</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for p in payments %}
+                            <tr>
+                                <td>{{ p.payment_date }}</td>
+                                <td>{{ p.amount }} руб.</td>
+                                <td>{{ p.payment_method }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

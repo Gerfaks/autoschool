@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+    <h4><i class="fas fa-calendar"></i> Занятия</h4>
+    <a href="/admin/lesson/add" class="btn btn-primary">+ Добавить занятие</a>
+</div>
+<form method="GET" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <select name="student_id" class="form-control">
+            <option value="">Все курсанты</option>
+            {% for s in students %}
+                <option value="{{ s.kursant_id }}" {% if filters.student_id|string == s.kursant_id|string %}selected{% endif %}>{{ s.fullname }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select name="instructor_id" class="form-control">
+            <option value="">Все инструкторы</option>
+            {% for i in instructors %}
+                <option value="{{ i.instructor_id }}" {% if filters.instructor_id|string == i.instructor_id|string %}selected{% endif %}>{{ i.fullname }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="status" class="form-control">
+            <option value="">Все статусы</option>
+            <option value="pending" {% if filters.status == 'pending' %}selected{% endif %}>Ждет подтверждения</option>
+            <option value="confirmed" {% if filters.status == 'confirmed' %}selected{% endif %}>Подтверждено</option>
+            <option value="completed" {% if filters.status == 'completed' %}selected{% endif %}>Проведено</option>
+            <option value="cancelled" {% if filters.status == 'cancelled' %}selected{% endif %}>Отменено</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <input type="date" name="lesson_date" class="form-control" value="{{ filters.lesson_date }}">
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Фильтр</button>
+        <a href="/admin/lessons" class="btn btn-secondary">Сброс</a>
+    </div>
+</form>
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Дата</th>
+                <th>Время</th>
+                <th>Тип</th>
+                <th>Курсант</th>
+                <th>Инструктор</th>
+                <th>Статус</th>
+                <th>Комментарий</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for l in lessons %}
+            <tr class="{% if l.status == 'completed' %}table-success{% elif l.status == 'cancelled' %}table-danger{% elif l.status == 'confirmed' %}table-primary{% endif %}">
+                <td>{{ l.lesson_id }}</td>
+                <td>{{ l.lesson_date }}</td>
+                <td>{{ l.lesson_time }}</td>
+                <td>{{ l.lesson_type }}</td>
+                <td>{{ l.kursant_name }}</td>
+                <td>{{ l.instructor_name }}</td>
+                <td>
+                    {% if l.status == 'completed' %}
+                        <span class="badge bg-success">✅ Проведено</span>
+                    {% elif l.status == 'cancelled' %}
+                        <span class="badge bg-danger">❌ Отменено</span>
+                    {% elif l.status == 'confirmed' %}
+                        <span class="badge bg-primary">✅ Подтверждено</span>
+                    {% else %}
+                        <span class="badge bg-warning">⏳ Ждет подтверждения</span>
+                    {% endif %}
+                </td>
+                <td>{{ l.comments or '-' }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8">Нет данных</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

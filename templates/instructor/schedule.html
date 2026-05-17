@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-calendar-alt"></i> Управление расписанием
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/instructor/schedule/add">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>Дата</label>
+                            <input type="date" name="lesson_date" class="form-control" min="{{ min_date }}" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Время</label>
+                            <input type="time" name="lesson_time" class="form-control" required>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">➕ Добавить слот</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-success text-white">
+        <i class="fas fa-calendar-week"></i> Мои слоты
+    </div>
+    <div class="card-body">
+        {% if slots %}
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Дата</th>
+                            <th>Время</th>
+                            <th>Статус</th>
+                            <th>Курсант</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in slots %}
+                        <tr class="{% if s.is_booked %}table-warning{% else %}table-success{% endif %}">
+                            <td>{{ s.lesson_date }}</td>
+                            <td>{{ s.lesson_time }}</td>
+                            <td>
+                                {% if s.is_booked %}
+                                    <span class="badge bg-warning">📖 Забронировано</span>
+                                {% else %}
+                                    <span class="badge bg-success">🟢 Свободно</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ s.student_name or '-' }}</td>
+	                            <td>
+	                                {% if not s.is_booked %}
+	                                    <form method="POST" action="/instructor/schedule/delete/{{ s.schedule_id }}" class="d-inline" onsubmit="return confirm('Удалить слот?')">
+	                                        <button type="submit" class="btn btn-sm btn-danger">🗑️ Удалить</button>
+	                                    </form>
+	                                {% else %}
+                                    <span class="text-muted">Забронировано</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted">Нет добавленных слотов</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
