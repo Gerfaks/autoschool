@@ -1,0 +1,76 @@
+body {
+    background: #eef3f8;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #222b36;
+    position: relative;
+    overflow-x: hidden;
+}
+.auth-shell { position: relative; z-index: 1; }
+.home-link {
+    position: fixed;
+    top: 22px;
+    left: 22px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid rgba(216, 224, 234, 0.95);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.86);
+    color: #243447;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 12px 30px rgba(16, 24, 40, 0.11);
+    backdrop-filter: blur(12px);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.home-link i {
+    color: #b64b3e;
+    font-size: 0.9rem;
+}
+.home-link:hover {
+    color: #172232;
+    border-color: rgba(184, 77, 63, 0.28);
+    box-shadow: 0 16px 36px rgba(16, 24, 40, 0.16);
+    transform: translateY(-1px);
+}
+.card { border: 1px solid #d9dee7; border-radius: 8px; box-shadow: 0 22px 60px rgba(16, 24, 40, 0.13); overflow: hidden; }
+.card::before { content: ""; display: block; height: 5px; background: #b84d3f; }
+.brand-mark { color: #b64b3e; }
+.btn-primary { background: #b64b3e; border-color: #b64b3e; border-radius: 6px; box-shadow: 0 12px 24px rgba(184, 77, 63, 0.18); }
+.btn-primary:hover { background: #963c32; border-color: #963c32; }
+.form-control { border-radius: 6px; min-height: 44px; }
+.form-control:focus { border-color: rgba(184, 77, 63, 0.65); box-shadow: 0 0 0 0.2rem rgba(184, 77, 63, 0.12); }
+.auth-note { color: #667085; font-size: 0.95rem; }
+.auth-links {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+}
+.auth-links a {
+    color: #245c8f;
+    font-weight: 600;
+    text-decoration: none;
+}
+.auth-links a:hover { color: #18476f; text-decoration: underline; }
+@media (prefers-reduced-motion: no-preference) {
+    @keyframes authFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+    @keyframes authIn {
+        from { opacity: 0; transform: translateY(18px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .card { animation: authIn 0.5s ease both; }
+}
+@media (max-width: 575px) {
+    .home-link {
+        top: 14px;
+        left: 14px;
+        padding: 9px 12px;
+    }
+}

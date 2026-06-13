@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="card">
-    <div class="card-header bg-primary text-white">📅 Мои занятия</div>
+    <div class="card-header"><i class="fas fa-calendar"></i> Мои занятия</div>
     <div class="card-body">
         {% if lessons %}
             <div class="table-responsive">
@@ -29,32 +29,32 @@
 	                                <td>{{ lesson_locations.get(l.lesson_id, 'Место уточнит администратор') }}</td>
 	                            <td>
 	                                {% if l.status == 'completed' %}
-	                                    <span class="badge bg-success">✅ Проведено</span>
+	                                    <span class="badge bg-success"><i class="fas fa-check"></i> Проведено</span>
 	                                {% elif l.status == 'cancelled' %}
-	                                    <span class="badge bg-danger">❌ Отменено</span>
+	                                    <span class="badge bg-danger"><i class="fas fa-ban"></i> Отменено</span>
                                     {% elif l.status == 'confirmed' %}
-                                        <span class="badge bg-primary">✅ Подтверждено</span>
+                                        <span class="badge bg-primary"><i class="fas fa-clipboard-check"></i> Подтверждено</span>
 	                                {% else %}
-	                                    <span class="badge bg-warning">⏳ Ждет подтверждения</span>
+	                                    <span class="badge bg-warning"><i class="fas fa-clock"></i> Ждет подтверждения</span>
 	                                {% endif %}
 	                            </td>
 	                            <td>
 	                                {% if l.status == 'pending' %}
 	                                    <div class="btn-group" role="group">
                                             <form method="POST" action="/instructor/lesson/confirm/{{ l.lesson_id }}" onsubmit="return confirm('Подтвердить занятие?')">
-                                                <button type="submit" class="btn btn-sm btn-primary">✅ Подтвердить</button>
+                                                <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-check"></i> Подтвердить</button>
                                             </form>
                                             <form method="POST" action="/instructor/lesson/cancel/{{ l.lesson_id }}" onsubmit="return confirm('Отменить занятие?')">
-                                                <button type="submit" class="btn btn-sm btn-danger">❌ Отменить</button>
+                                                <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-ban"></i> Отменить</button>
                                             </form>
 	                                    </div>
                                     {% elif l.status == 'confirmed' %}
                                         <div class="btn-group" role="group">
                                             <form method="POST" action="/instructor/lesson/complete/{{ l.lesson_id }}" onsubmit="return confirm('Отметить как проведенное?')">
-                                                <button type="submit" class="btn btn-sm btn-success">✅ Проведено</button>
+                                                <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-check-double"></i> Проведено</button>
                                             </form>
                                             <form method="POST" action="/instructor/lesson/cancel/{{ l.lesson_id }}" onsubmit="return confirm('Отменить занятие?')">
-                                                <button type="submit" class="btn btn-sm btn-danger">❌ Отменить</button>
+                                                <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-ban"></i> Отменить</button>
                                             </form>
                                         </div>
 	                                {% elif l.status == 'completed' %}

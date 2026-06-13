@@ -14,6 +14,12 @@ THEORY_LOCATION = 'Корпус 1, учебный класс'
 DEFAULT_GROUND_LOCATION = 'Площадка автошколы'
 NO_INSTRUCTOR_GROUND_LOCATION = 'Площадка инструктора не назначена'
 
+ASSIGNMENT_STATUS_LABELS = {
+    'not_started': 'Не начато',
+    'in_progress': 'В процессе',
+    'completed': 'Завершено',
+}
+
 
 def restrict_role_sections():
     if not current_user.is_authenticated:
@@ -127,6 +133,8 @@ def get_menu_items(active_page, role):
             {'name': 'Площадки', 'url': '/admin/grounds', 'icon': 'fas fa-map-marker-alt', 'active': active_page == 'grounds'},
             {'name': 'Тарифы', 'url': '/admin/tariffs', 'icon': 'fas fa-tags', 'active': active_page == 'tariffs'},
             {'name': 'Занятия', 'url': '/admin/lessons', 'icon': 'fas fa-calendar', 'active': active_page == 'lessons'},
+            {'name': 'Курсы', 'url': '/admin/courses', 'icon': 'fas fa-book-open', 'active': active_page == 'courses'},
+            {'name': 'Задачи', 'url': '/todo', 'icon': 'fas fa-list-check', 'active': active_page == 'todo'},
             {'name': 'Платежи', 'url': '/admin/payments', 'icon': 'fas fa-ruble-sign', 'active': active_page == 'payments'},
             {'name': 'Отмены', 'url': '/admin/cancellations', 'icon': 'fas fa-ban', 'active': active_page == 'cancellations'},
             {'name': 'Заявки', 'url': '/admin/requests', 'icon': 'fas fa-clipboard-list', 'active': active_page == 'requests'},
@@ -136,8 +144,11 @@ def get_menu_items(active_page, role):
             {'name': 'Мои занятия', 'url': '/instructor', 'icon': 'fas fa-calendar', 'active': active_page == 'dashboard'},
             {'name': 'Мое расписание', 'url': '/instructor/schedule', 'icon': 'fas fa-clock', 'active': active_page == 'schedule'},
             {'name': 'Мой автомобиль', 'url': '/instructor/car', 'icon': 'fas fa-car', 'active': active_page == 'car'},
+            {'name': 'Задачи', 'url': '/todo', 'icon': 'fas fa-list-check', 'active': active_page == 'todo'},
         ]
     return [
         {'name': 'Мои занятия', 'url': '/student', 'icon': 'fas fa-calendar', 'active': active_page == 'dashboard'},
         {'name': 'Записаться', 'url': '/student/booking', 'icon': 'fas fa-calendar-plus', 'active': active_page == 'booking'},
+        {'name': 'Мои курсы', 'url': '/student/courses', 'icon': 'fas fa-book-open', 'active': active_page == 'courses'},
+        {'name': 'Задачи', 'url': '/todo', 'icon': 'fas fa-list-check', 'active': active_page == 'todo'},
     ]

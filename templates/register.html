@@ -2,14 +2,30 @@
 <html>
 <head>
     <title>Регистрация - Автошкола</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
     <style>
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 50px 0; }
-        .card { border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        body { padding: 42px 0; }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: url("{{ url_for('static', filename='img/hero-driving-school-illustration.png') }}") right 5vw bottom 6vh / min(46vw, 640px) auto no-repeat;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+        .container { position: relative; z-index: 1; }
+        .form-control { min-height: 40px; }
+        @media (prefers-reduced-motion: no-preference) {
+            body::before { animation: authFloat 7s ease-in-out infinite; }
+        }
     </style>
 </head>
 	<body>
+        <a href="{{ url_for('index') }}" class="home-link"><i class="fas fa-arrow-left"></i> На главную</a>
 	    {% set form_data = form_data|default({}) %}
 	    {% set selected_role = form_data.get('role', '') %}
 	    <div class="container">
@@ -17,7 +33,7 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-body p-4">
-                        <h2 class="text-center mb-4"><i class="fas fa-user-plus"></i> Регистрация</h2>
+                        <h2 class="text-center mb-4"><i class="fas fa-user-plus brand-mark"></i> Регистрация</h2>
                         
 	                        {% with messages = get_flashed_messages(with_categories=true) %}
 	                            {% for category, msg in messages %}
@@ -33,6 +49,7 @@
 	                        {% endwith %}
                         
                         <form method="POST" action="/register" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
@@ -144,7 +161,9 @@
                             <button type="submit" class="btn btn-primary w-100">Отправить заявку</button>
                         </form>
                         <hr>
-                        <p class="text-center">Уже есть аккаунт? <a href="/login">Войти</a></p>
+                        <div class="auth-links">
+                            <span>Уже есть аккаунт? <a href="/login">Войти</a></span>
+                        </div>
                     </div>
                 </div>
             </div>

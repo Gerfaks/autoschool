@@ -1,0 +1,10 @@
+.git
+.env
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.DS_Store
+venv/
+flask.log
+uploads/

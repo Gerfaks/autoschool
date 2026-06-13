@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/todo.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-hero d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+        <h3><i class="fas fa-list-check"></i> Личные задачи</h3>
+        <p>Планируйте дела, распределяйте их по категориям и контролируйте сроки.</p>
+    </div>
+    <span class="status-pill status-active"><i class="fas fa-lock"></i> Только ваши записи</span>
+</div>
+
+<div class="todo-stats">
+    <div class="todo-stat"><span>Всего</span><strong id="count-total">0</strong></div>
+    <div class="todo-stat"><span>Активные</span><strong id="count-active">0</strong></div>
+    <div class="todo-stat"><span>Завершено</span><strong id="count-completed">0</strong></div>
+    <div class="todo-stat"><span>Срок истек</span><strong id="count-overdue">0</strong></div>
+</div>
+
+<div class="todo-grid">
+    <div>
+        <div class="card">
+            <div class="card-header"><i class="fas fa-pen-to-square"></i> Дело</div>
+            <div class="card-body">
+                <form id="todo-form">
+                    <input type="hidden" id="todo-id">
+                    <div class="mb-3">
+                        <label>Название</label>
+                        <input type="text" id="todo-title" class="form-control" placeholder="Например: подготовить документы" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Описание</label>
+                        <textarea id="todo-description" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label>Категория</label>
+                        <select id="todo-category" class="form-control"></select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label>Срок</label>
+                                <input type="date" id="todo-due-date" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label>Приоритет</label>
+                                <select id="todo-priority" class="form-control">
+                                    <option value="normal">Обычный</option>
+                                    <option value="high">Высокий</option>
+                                    <option value="low">Низкий</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" id="todo-complete" class="form-check-input">
+                        <label for="todo-complete" class="form-check-label">Выполнено</label>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary" id="todo-submit">
+                            <i class="fas fa-plus"></i> Добавить
+                        </button>
+                        <button type="button" class="btn btn-secondary d-none" id="todo-cancel">
+                            Отмена
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="fas fa-tags"></i> Категории</div>
+            <div class="card-body">
+                <form id="category-form" class="mb-3">
+                    <input type="hidden" id="category-id">
+                    <div class="mb-3">
+                        <label>Название категории</label>
+                        <input type="text" id="category-name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Цвет</label>
+                        <input type="color" id="category-color" class="form-control form-control-color" value="#b84d3f">
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary" id="category-submit">
+                            <i class="fas fa-plus"></i> Добавить
+                        </button>
+                        <button type="button" class="btn btn-secondary d-none" id="category-cancel">
+                            Отмена
+                        </button>
+                    </div>
+                </form>
+                <div class="category-list" id="category-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <form id="todo-filters" class="row g-2 mb-3">
+            <div class="col-md-4">
+                <input type="search" id="filter-query" class="form-control" placeholder="Поиск">
+            </div>
+            <div class="col-md-3">
+                <select id="filter-status" class="form-control">
+                    <option value="all">Все статусы</option>
+                    <option value="active">Активные</option>
+                    <option value="completed">Завершенные</option>
+                    <option value="overdue">С истекшим сроком</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select id="filter-category" class="form-control"></select>
+            </div>
+            <div class="col-md-2">
+                <select id="filter-priority" class="form-control">
+                    <option value="">Все</option>
+                    <option value="high">Высокий</option>
+                    <option value="normal">Обычный</option>
+                    <option value="low">Низкий</option>
+                </select>
+            </div>
+        </form>
+        <div class="todo-list" id="todo-list"></div>
+        <div class="todo-empty d-none" id="todo-empty">
+            <i class="fas fa-list-check fa-2x mb-2"></i>
+            <div>Задач по выбранным условиям нет</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/todo.js') }}"></script>
+{% endblock %}

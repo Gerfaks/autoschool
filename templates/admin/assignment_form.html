@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header bg-primary text-white">{{ title }}: {{ course.title }}</div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Название задания</label>
+                        <input type="text" name="title" class="form-control" value="{{ assignment.title if assignment else '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Дедлайн</label>
+                        <input type="date" name="deadline" class="form-control" value="{{ assignment.deadline.strftime('%Y-%m-%d') if assignment and assignment.deadline else assignment.deadline_text if assignment and assignment.deadline_text else '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Описание</label>
+                        <textarea name="description" class="form-control" rows="4">{{ assignment.description if assignment and assignment.description else '' }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <a href="{{ url_for('admin_course_detail', id=course.course_id) }}" class="btn btn-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

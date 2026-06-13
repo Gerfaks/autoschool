@@ -23,7 +23,18 @@
                     {% for c in cancellations %}
                     <tr>
                         <td>{{ c.cancelled_at.strftime('%d.%m.%Y %H:%M') if c.cancelled_at else '-' }}</td>
-                        <td>{{ 'Курсант' if c.cancelled_by_role == 'student' else 'Инструктор' }}: {{ c.cancelled_by_name or '-' }}</td>
+                        <td>
+                            {% if c.cancelled_by_role == 'student' %}
+                                Курсант:
+                            {% elif c.cancelled_by_role == 'instructor' %}
+                                Инструктор:
+                            {% elif c.cancelled_by_role == 'admin' %}
+                                Администратор:
+                            {% else %}
+                                Пользователь:
+                            {% endif %}
+                            {{ c.cancelled_by_name or '-' }}
+                        </td>
                         <td>{{ c.lesson_date }}</td>
                         <td>{{ c.lesson_time }}</td>
                         <td>{{ c.lesson_type }}</td>

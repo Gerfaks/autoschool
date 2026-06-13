@@ -1,0 +1,24 @@
+Аккаунты для быстрого входа
+Администратор:
+Логин: admin
+Пароль: admin123
+
+Инструктор:
+Логин: sergey.petrov
+Пароль: instructor123
+
+Курсант 1:
+Логин: anna.smirnova
+Пароль: student123
+
+Курсант 2:
+Логин: ivan.petrov
+Пароль: student123
+
+Курсант 3:
+Логин: maria.sokolova
+Пароль: student123
+
+Курсант 4:
+Логин: alexey.orlov
+Пароль: student123

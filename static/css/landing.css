@@ -1,0 +1,167 @@
+:root {
+    --ink: #101828;
+    --muted: #667085;
+    --accent: #b84d3f;
+    --accent-dark: #94392f;
+    --line: #d8e0ea;
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: #eef3f8;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: var(--ink);
+    overflow-x: hidden;
+}
+.hero {
+    min-height: 82vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 48px min(8vw, 110px);
+    isolation: isolate;
+}
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 120px;
+    background: #ffffff;
+    z-index: -3;
+}
+.hero-content {
+    width: min(620px, 100%);
+    padding: 18px 0;
+}
+.eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+    padding: 7px 11px;
+    border: 1px solid rgba(184, 77, 63, 0.20);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.74);
+    color: var(--accent-dark);
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+h1 {
+    font-size: clamp(3rem, 7vw, 6.2rem);
+    line-height: 0.93;
+    margin-bottom: 1.15rem;
+    font-weight: 850;
+    letter-spacing: 0;
+}
+.lead {
+    width: min(520px, 100%);
+    color: #445264;
+    font-size: 1.18rem;
+    line-height: 1.65;
+    margin-bottom: 30px;
+}
+.hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+.btn-custom {
+    background: var(--accent);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    box-shadow: 0 18px 30px rgba(184, 77, 63, 0.22);
+}
+.btn-custom:hover { background: var(--accent-dark); color: white; }
+.register-link {
+    color: #245c8f;
+    text-decoration: none;
+    font-weight: 700;
+}
+.register-link:hover { color: #18476f; text-decoration: underline; }
+.quick-proof {
+    width: min(1120px, calc(100% - 32px));
+    margin: -56px auto 42px;
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+.proof-item {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px;
+    box-shadow: 0 16px 40px rgba(16, 24, 40, 0.10);
+}
+.proof-item i {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: #fff0ed;
+    color: var(--accent);
+    margin-bottom: 12px;
+}
+.proof-item strong { display: block; margin-bottom: 4px; }
+.proof-item span { color: var(--muted); font-size: 0.94rem; }
+@media (prefers-reduced-motion: no-preference) {
+    @keyframes heroFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    @keyframes fadeSlide {
+        from { opacity: 0; transform: translateY(18px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes proofIn {
+        from { opacity: 0; transform: translateY(16px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .eyebrow,
+    h1,
+    .lead,
+    .hero-actions {
+        opacity: 0;
+        animation: fadeSlide 0.62s ease forwards;
+    }
+    .eyebrow { animation-delay: 0.05s; }
+    h1 { animation-delay: 0.14s; }
+    .lead { animation-delay: 0.24s; }
+    .hero-actions { animation-delay: 0.34s; }
+    .proof-item {
+        opacity: 0;
+        animation: proofIn 0.52s ease forwards;
+    }
+    .proof-item:nth-child(1) { animation-delay: 0.42s; }
+    .proof-item:nth-child(2) { animation-delay: 0.52s; }
+    .proof-item:nth-child(3) { animation-delay: 0.62s; }
+    .proof-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 22px 48px rgba(16, 24, 40, 0.13);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
+}
+@media (max-width: 900px) {
+    .hero { min-height: auto; padding: 38px 20px 150px; }
+    .hero::before { background-position: right -30px bottom 12px; background-size: 360px auto; opacity: 0.45; }
+    .quick-proof { grid-template-columns: 1fr; margin-top: -86px; }
+}

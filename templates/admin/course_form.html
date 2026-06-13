@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header bg-primary text-white">{{ title }}</div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Название курса</label>
+                        <input type="text" name="title" class="form-control" value="{{ course.title if course else '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Категория</label>
+                        {% set selected_category = course.category if course else '' %}
+                        <select name="category" class="form-control">
+                            <option value="" {% if not selected_category %}selected{% endif %}>Не указана</option>
+                            <option value="A" {% if selected_category == 'A' %}selected{% endif %}>A</option>
+                            <option value="B" {% if selected_category == 'B' %}selected{% endif %}>B</option>
+                            <option value="C" {% if selected_category == 'C' %}selected{% endif %}>C</option>
+                            <option value="Общий" {% if selected_category == 'Общий' %}selected{% endif %}>Общий</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Описание</label>
+                        <textarea name="description" class="form-control" rows="4">{{ course.description if course and course.description else '' }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <a href="{{ url_for('admin_courses') }}" class="btn btn-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

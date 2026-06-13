@@ -33,7 +33,9 @@
                         <label>Комментарий</label>
                         <textarea name="comment" class="form-control" rows="2"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">💳 Внести оплату</button>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-credit-card"></i> Внести оплату
+                    </button>
                 </form>
             </div>
         </div>
@@ -135,11 +137,11 @@
                                 <td><b>{{ d.debt }}</b></td>
 	                                <td>
 	                                    {% if d.debt > 0 %}
-	                                        <form method="POST" action="/admin/payment/remind/{{ d.id }}" class="d-inline">
-	                                            <button type="submit" class="btn btn-sm btn-warning">📢 Напомнить</button>
+	                                        <form method="POST" action="/admin/payment/remind/{{ d.kursant_id }}" class="d-inline">
+	                                            <button type="submit" class="btn btn-sm btn-warning"><i class="fas fa-bell"></i> Напомнить</button>
 	                                        </form>
 	                                    {% else %}
-                                        ✅
+                                        <span class="badge bg-success"><i class="fas fa-check"></i> Оплачено</span>
                                     {% endif %}
                                 </td>
                             </tr>

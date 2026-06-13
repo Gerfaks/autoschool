@@ -164,6 +164,6 @@ def register_auth_routes(app):
         try:
             db.session.execute(text('SELECT 1'))
             db.session.commit()
-            return "✅ База данных работает!"
+            return "База данных работает"
         except Exception as e:
-            return f"❌ Ошибка: {e}"
+            return f"Ошибка: {e}"

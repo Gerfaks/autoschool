@@ -223,7 +223,7 @@ def register_instructor_routes(app):
             ).first()
             
             if existing:
-                flash('❌ Такой слот уже существует')
+                flash('Такой слот уже существует')
                 return redirect(url_for('instructor_schedule'))
             
             slot = InstructorSchedule(
@@ -234,9 +234,9 @@ def register_instructor_routes(app):
             )
             db.session.add(slot)
             db.session.commit()
-            flash('✅ Слот добавлен')
+            flash('Слот добавлен')
         except Exception as e:
-            flash(f'❌ Ошибка: {e}')
+            flash(f'Ошибка: {e}')
         
         return redirect(url_for('instructor_schedule'))
 
@@ -251,10 +251,10 @@ def register_instructor_routes(app):
             return "Доступ запрещен", 403
         
         if slot.is_booked:
-            flash('❌ Нельзя удалить забронированный слот')
+            flash('Нельзя удалить забронированный слот')
             return redirect(url_for('instructor_schedule'))
         
         db.session.delete(slot)
         db.session.commit()
-        flash('✅ Слот удален')
+        flash('Слот удален')
         return redirect(url_for('instructor_schedule'))

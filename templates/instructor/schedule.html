@@ -18,7 +18,7 @@
                             <input type="time" name="lesson_time" class="form-control" required>
                         </div>
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary w-100">➕ Добавить слот</button>
+                            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-plus"></i> Добавить слот</button>
                         </div>
                     </div>
                 </form>
@@ -51,16 +51,16 @@
                             <td>{{ s.lesson_time }}</td>
                             <td>
                                 {% if s.is_booked %}
-                                    <span class="badge bg-warning">📖 Забронировано</span>
+                                    <span class="badge bg-warning"><i class="fas fa-book-open"></i> Забронировано</span>
                                 {% else %}
-                                    <span class="badge bg-success">🟢 Свободно</span>
+                                    <span class="badge bg-success"><i class="fas fa-circle-check"></i> Свободно</span>
                                 {% endif %}
                             </td>
                             <td>{{ s.student_name or '-' }}</td>
 	                            <td>
 	                                {% if not s.is_booked %}
 	                                    <form method="POST" action="/instructor/schedule/delete/{{ s.schedule_id }}" class="d-inline" onsubmit="return confirm('Удалить слот?')">
-	                                        <button type="submit" class="btn btn-sm btn-danger">🗑️ Удалить</button>
+	                                        <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Удалить</button>
 	                                    </form>
 	                                {% else %}
                                     <span class="text-muted">Забронировано</span>

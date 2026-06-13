@@ -211,6 +211,101 @@ def migrate_schema():
         """)
 
     execute("""
+        CREATE TABLE IF NOT EXISTS training_courses (
+            course_id SERIAL PRIMARY KEY,
+            title VARCHAR(120) NOT NULL,
+            description TEXT,
+            category VARCHAR(20),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    execute("""
+        CREATE TABLE IF NOT EXISTS training_assignments (
+            assignment_id SERIAL PRIMARY KEY,
+            course_id INTEGER NOT NULL REFERENCES training_courses(course_id) ON DELETE CASCADE,
+            title VARCHAR(160) NOT NULL,
+            description TEXT,
+            deadline DATE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    execute("""
+        CREATE TABLE IF NOT EXISTS student_courses (
+            enrollment_id SERIAL PRIMARY KEY,
+            course_id INTEGER NOT NULL REFERENCES training_courses(course_id) ON DELETE CASCADE,
+            kursant_id INTEGER NOT NULL REFERENCES kursanty(kursant_id) ON DELETE CASCADE,
+            assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT student_courses_course_student_uq UNIQUE (course_id, kursant_id)
+        )
+    """)
+    execute("""
+        CREATE TABLE IF NOT EXISTS student_assignment_progress (
+            progress_id SERIAL PRIMARY KEY,
+            assignment_id INTEGER NOT NULL REFERENCES training_assignments(assignment_id) ON DELETE CASCADE,
+            kursant_id INTEGER NOT NULL REFERENCES kursanty(kursant_id) ON DELETE CASCADE,
+            status VARCHAR(20) NOT NULL DEFAULT 'not_started',
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT student_assignment_progress_assignment_student_uq UNIQUE (assignment_id, kursant_id)
+        )
+    """)
+    execute("""
+        CREATE INDEX IF NOT EXISTS training_assignments_course_id_idx
+        ON training_assignments (course_id)
+    """)
+    execute("""
+        CREATE INDEX IF NOT EXISTS training_assignments_deadline_idx
+        ON training_assignments (deadline)
+    """)
+    execute("""
+        CREATE INDEX IF NOT EXISTS student_courses_kursant_id_idx
+        ON student_courses (kursant_id)
+    """)
+    execute("""
+        CREATE INDEX IF NOT EXISTS student_assignment_progress_kursant_status_idx
+        ON student_assignment_progress (kursant_id, status)
+    """)
+    execute("""
+        CREATE TABLE IF NOT EXISTS todo_categories (
+            category_id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            name VARCHAR(80) NOT NULL,
+            color VARCHAR(20) DEFAULT '#b84d3f',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT todo_categories_user_name_uq UNIQUE (user_id, name)
+        )
+    """)
+    execute("""
+        CREATE TABLE IF NOT EXISTS todo_items (
+            todo_id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            category_id INTEGER REFERENCES todo_categories(category_id) ON DELETE SET NULL,
+            title VARCHAR(160) NOT NULL,
+            description TEXT,
+            is_complete BOOLEAN NOT NULL DEFAULT FALSE,
+            priority VARCHAR(20) NOT NULL DEFAULT 'normal',
+            due_date DATE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    execute("""
+        CREATE INDEX IF NOT EXISTS todo_categories_user_id_idx
+        ON todo_categories (user_id)
+    """)
+    execute("""
+        CREATE INDEX IF NOT EXISTS todo_items_user_id_idx
+        ON todo_items (user_id)
+    """)
+    execute("""
+        CREATE INDEX IF NOT EXISTS todo_items_category_id_idx
+        ON todo_items (category_id)
+    """)
+    execute("""
+        CREATE INDEX IF NOT EXISTS todo_items_due_date_idx
+        ON todo_items (due_date)
+    """)
+
+    execute("""
         DO $$
         BEGIN
             ALTER TABLE users

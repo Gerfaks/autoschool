@@ -164,3 +164,107 @@ class Payments(db.Model):
     created_by_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
 
     created_by_user = db.relationship('User')
+
+
+class TrainingCourse(db.Model):
+    __tablename__ = 'training_courses'
+
+    course_id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(120), nullable=False)
+    description = db.Column(db.Text)
+    category = db.Column(db.String(20))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    assignments = db.relationship(
+        'TrainingAssignment',
+        back_populates='course',
+        cascade='all, delete-orphan',
+    )
+    enrollments = db.relationship(
+        'StudentCourse',
+        back_populates='course',
+        cascade='all, delete-orphan',
+    )
+
+
+class TrainingAssignment(db.Model):
+    __tablename__ = 'training_assignments'
+
+    assignment_id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('training_courses.course_id', ondelete='CASCADE'), nullable=False)
+    title = db.Column(db.String(160), nullable=False)
+    description = db.Column(db.Text)
+    deadline = db.Column(db.Date)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    course = db.relationship('TrainingCourse', back_populates='assignments')
+    progress_entries = db.relationship(
+        'StudentAssignmentProgress',
+        back_populates='assignment',
+        cascade='all, delete-orphan',
+    )
+
+
+class StudentCourse(db.Model):
+    __tablename__ = 'student_courses'
+    __table_args__ = (
+        db.UniqueConstraint('course_id', 'kursant_id', name='student_courses_course_student_uq'),
+    )
+
+    enrollment_id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('training_courses.course_id', ondelete='CASCADE'), nullable=False)
+    kursant_id = db.Column(db.Integer, db.ForeignKey('kursanty.kursant_id', ondelete='CASCADE'), nullable=False)
+    assigned_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    course = db.relationship('TrainingCourse', back_populates='enrollments')
+    student = db.relationship('Kursanty')
+
+
+class StudentAssignmentProgress(db.Model):
+    __tablename__ = 'student_assignment_progress'
+    __table_args__ = (
+        db.UniqueConstraint('assignment_id', 'kursant_id', name='student_assignment_progress_assignment_student_uq'),
+    )
+
+    progress_id = db.Column(db.Integer, primary_key=True)
+    assignment_id = db.Column(db.Integer, db.ForeignKey('training_assignments.assignment_id', ondelete='CASCADE'), nullable=False)
+    kursant_id = db.Column(db.Integer, db.ForeignKey('kursanty.kursant_id', ondelete='CASCADE'), nullable=False)
+    status = db.Column(db.String(20), default='not_started', nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    assignment = db.relationship('TrainingAssignment', back_populates='progress_entries')
+    student = db.relationship('Kursanty')
+
+
+class TodoCategory(db.Model):
+    __tablename__ = 'todo_categories'
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'name', name='todo_categories_user_name_uq'),
+    )
+
+    category_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    name = db.Column(db.String(80), nullable=False)
+    color = db.Column(db.String(20), default='#b84d3f')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User')
+    items = db.relationship('TodoItem', back_populates='category')
+
+
+class TodoItem(db.Model):
+    __tablename__ = 'todo_items'
+
+    todo_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('todo_categories.category_id', ondelete='SET NULL'), nullable=True)
+    title = db.Column(db.String(160), nullable=False)
+    description = db.Column(db.Text)
+    is_complete = db.Column(db.Boolean, default=False, nullable=False)
+    priority = db.Column(db.String(20), default='normal', nullable=False)
+    due_date = db.Column(db.Date)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = db.relationship('User')
+    category = db.relationship('TodoCategory', back_populates='items')

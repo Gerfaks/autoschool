@@ -1,39 +1,54 @@
 {% extends "base.html" %}
 {% block content %}
+<div class="page-hero d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+        <h3><i class="fas fa-gauge-high"></i> Рабочая панель автошколы</h3>
+        <p>Ключевые показатели за месяц, контроль долгов и быстрый доступ к учебным курсам.</p>
+    </div>
+    <div class="action-bar">
+        <a href="{{ url_for('admin_courses') }}" class="btn btn-primary">
+            <i class="fas fa-book-open"></i> Курсы
+        </a>
+        <a href="{{ url_for('admin_overdue_report', file_format='xlsx') }}" class="btn btn-outline-primary">
+            <i class="fas fa-file-excel"></i> Истекшие сроки
+        </a>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-md-3 mb-3">
-        <div class="card stat-card">
+        <div class="card metric-card">
             <div class="card-body">
                 <h2>{{ students_count }}</h2>
                 <p>Курсантов</p>
-                <i class="fas fa-users" style="position: absolute; right: 20px; top: 20px; font-size: 30px; opacity: 0.3;"></i>
+                <i class="fas fa-users"></i>
             </div>
         </div>
     </div>
     <div class="col-md-3 mb-3">
-        <div class="card bg-success text-white">
+        <div class="card metric-card">
             <div class="card-body">
                 <h2>{{ instructors_count }}</h2>
                 <p>Инструкторов</p>
-                <i class="fas fa-chalkboard-user" style="position: absolute; right: 20px; top: 20px; font-size: 30px; opacity: 0.3;"></i>
+                <i class="fas fa-chalkboard-user"></i>
             </div>
         </div>
     </div>
     <div class="col-md-3 mb-3">
-        <div class="card bg-warning text-white">
+        <div class="card metric-card">
             <div class="card-body">
                 <h2>{{ cars_count }}</h2>
                 <p>Автомобилей</p>
-                <i class="fas fa-car" style="position: absolute; right: 20px; top: 20px; font-size: 30px; opacity: 0.3;"></i>
+                <i class="fas fa-car"></i>
             </div>
         </div>
     </div>
 	    <div class="col-md-3 mb-3">
-	        <div class="card bg-info text-white">
+	        <div class="card metric-card">
 	            <div class="card-body">
 	                <h2>{{ lessons_count }}</h2>
 	                <p>Проведенных занятий</p>
-	                <i class="fas fa-calendar" style="position: absolute; right: 20px; top: 20px; font-size: 30px; opacity: 0.3;"></i>
+	                <i class="fas fa-calendar"></i>
 	            </div>
 	        </div>
 	    </div>
@@ -41,20 +56,20 @@
 
 <div class="row">
     <div class="col-md-6 mb-3">
-        <div class="card bg-success text-white">
+        <div class="card metric-card">
             <div class="card-body">
                 <h2>{{ month_revenue|round(0) }} руб.</h2>
                 <p>Выручка за месяц {{ month_title }}</p>
-                <i class="fas fa-ruble-sign" style="position: absolute; right: 20px; top: 20px; font-size: 30px; opacity: 0.3;"></i>
+                <i class="fas fa-ruble-sign"></i>
             </div>
         </div>
     </div>
     <div class="col-md-6 mb-3">
-        <div class="card bg-secondary text-white">
+        <div class="card metric-card">
             <div class="card-body">
                 <h2>{{ month_completed_lessons }}</h2>
                 <p>Проведенных занятий за месяц {{ month_title }}</p>
-                <i class="fas fa-check-circle" style="position: absolute; right: 20px; top: 20px; font-size: 30px; opacity: 0.3;"></i>
+                <i class="fas fa-check-circle"></i>
             </div>
         </div>
     </div>
@@ -63,7 +78,7 @@
 <div class="row">
     <div class="col-md-6 mb-3">
         <div class="card">
-		            <div class="card-header">📊 Проведенные занятия за месяц {{ month_title }}</div>
+		            <div class="card-header"><i class="fas fa-chart-column"></i> Проведенные занятия за месяц {{ month_title }}</div>
             <div class="card-body">
                 <canvas id="lessonsChart" height="200"></canvas>
             </div>
@@ -71,7 +86,7 @@
     </div>
     <div class="col-md-6 mb-3">
         <div class="card">
-	            <div class="card-header">💰 Выручка за месяц {{ month_title }} (руб.)</div>
+	            <div class="card-header"><i class="fas fa-chart-line"></i> Выручка за месяц {{ month_title }} (руб.)</div>
             <div class="card-body">
                 <canvas id="financeChart" height="200"></canvas>
             </div>
@@ -82,7 +97,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card">
-            <div class="card-header">⚠️ Должники</div>
+            <div class="card-header"><i class="fas fa-triangle-exclamation"></i> Должники</div>
             <div class="card-body">
                 <table class="table">
                     <thead>
@@ -120,7 +135,7 @@
             datasets: [{
 	                label: "Проведенные занятия",
                 data: lessonsData,
-                backgroundColor: "#667eea"
+                backgroundColor: "#b64b3e"
             }]
         }
     });
@@ -132,10 +147,10 @@
             datasets: [{
                 label: "Выручка (руб.)",
                 data: paymentsData,
-                borderColor: "#e94560",
+                borderColor: "#3f7d5a",
                 tension: 0.3,
                 fill: true,
-                backgroundColor: "rgba(233,69,96,0.1)"
+                backgroundColor: "rgba(63,125,90,0.12)"
             }]
         }
     });

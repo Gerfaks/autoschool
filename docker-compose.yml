@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: drivingschool
+      POSTGRES_USER: autoschool
+      POSTGRES_PASSWORD: autoschool
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U autoschool -d drivingschool"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://autoschool:autoschool@db:5432/drivingschool
+      SECRET_KEY: docker-dev-secret
+      HOST: 0.0.0.0
+      PORT: 5001
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./uploads:/app/uploads
+
+volumes:
+  postgres_data:

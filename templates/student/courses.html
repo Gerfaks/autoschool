@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-hero d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+        <h3><i class="fas fa-book-open"></i> Назначенные курсы</h3>
+        <p>Следите за заданиями, дедлайнами и личным статусом выполнения.</p>
+    </div>
+    <div class="action-bar">
+        <a href="{{ url_for('student_courses_report', file_format='docx', status=filters.status, deadline_sort=filters.deadline_sort) }}" class="btn btn-outline-primary">
+            <i class="fas fa-file-word"></i> DOCX
+        </a>
+        <a href="{{ url_for('student_courses_report', file_format='xlsx', status=filters.status, deadline_sort=filters.deadline_sort) }}" class="btn btn-outline-primary">
+            <i class="fas fa-file-excel"></i> XLSX
+        </a>
+    </div>
+</div>
+
+<form method="GET" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <select name="status" class="form-control">
+            <option value="">Все статусы</option>
+            {% for status, label in status_labels.items() %}
+                <option value="{{ status }}" {% if filters.status == status %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-4">
+        <select name="deadline_sort" class="form-control">
+            <option value="none" {% if filters.deadline_sort == 'none' %}selected{% endif %}>Без сортировки по дедлайну</option>
+            <option value="asc" {% if filters.deadline_sort == 'asc' %}selected{% endif %}>Сначала ближайшие дедлайны</option>
+            <option value="desc" {% if filters.deadline_sort == 'desc' %}selected{% endif %}>Сначала дальние дедлайны</option>
+        </select>
+    </div>
+    <div class="col-md-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-filter"></i> Применить
+        </button>
+        <a href="{{ url_for('student_courses') }}" class="btn btn-secondary">Сброс</a>
+    </div>
+</form>
+
+{% for group in course_groups %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        {% set total = group.assignments|length %}
+        {% set ns = namespace(done=0) %}
+        {% for item in group.assignments %}
+            {% if item.progress.status == 'completed' %}
+                {% set ns.done = ns.done + 1 %}
+            {% endif %}
+        {% endfor %}
+        <span><i class="fas fa-book-open"></i> {{ group.course.title }}</span>
+        <span class="status-pill status-active">{{ group.course.category or 'Общий' }}</span>
+    </div>
+    <div class="card-body">
+        {% if group.course.description %}
+            <p class="text-muted">{{ group.course.description }}</p>
+        {% endif %}
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-muted small">Прогресс курса</span>
+            <strong class="small">{{ ns.done }} из {{ total }}</strong>
+        </div>
+        <div class="progress mb-3">
+            <div class="progress-bar" role="progressbar" style="width: {{ (ns.done * 100 / total)|round(0) if total else 0 }}%"></div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Задание</th>
+                        <th>Дедлайн</th>
+                        <th>Статус</th>
+                        <th>Изменить статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in group.assignments %}
+                    <tr>
+                        <td>
+                            <div class="fw-semibold">{{ item.assignment.title }}</div>
+                            <div class="text-muted small">{{ item.assignment.description or '-' }}</div>
+                        </td>
+                        <td>
+                            <div class="fw-semibold">{{ item.assignment.deadline.strftime('%d.%m.%Y') if item.assignment.deadline else '-' }}</div>
+                            <span class="deadline-pill {{ item.deadline_badge.class }}">
+                                <i class="{{ item.deadline_badge.icon }}"></i> {{ item.deadline_badge.label }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if item.progress.status == 'completed' %}
+                                <span class="status-pill status-done"><i class="fas fa-check"></i> {{ status_labels[item.progress.status] }}</span>
+                            {% elif item.progress.status == 'in_progress' %}
+                                <span class="status-pill status-active"><i class="fas fa-spinner"></i> {{ status_labels[item.progress.status] }}</span>
+                            {% else %}
+                                <span class="status-pill status-muted"><i class="fas fa-circle"></i> {{ status_labels[item.progress.status] }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ url_for('student_update_assignment_status', progress_id=item.progress.progress_id) }}" class="d-flex gap-2">
+                                <input type="hidden" name="current_status_filter" value="{{ filters.status }}">
+                                <input type="hidden" name="current_deadline_sort" value="{{ filters.deadline_sort }}">
+                                <select name="status" class="form-control form-control-sm">
+                                    {% for status, label in status_labels.items() %}
+                                        <option value="{{ status }}" {% if item.progress.status == status %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4">По выбранным условиям заданий нет</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-book-open fa-2x mb-2"></i>
+    <div>Назначенных курсов пока нет</div>
+</div>
+{% endfor %}
+{% endblock %}

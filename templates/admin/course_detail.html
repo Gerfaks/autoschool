@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-hero d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+        <a href="{{ url_for('admin_courses') }}" class="btn btn-sm btn-outline-secondary mb-2">
+            <i class="fas fa-arrow-left"></i> К списку
+        </a>
+        <h3 class="mb-1">{{ course.title }}</h3>
+        <p>{{ course.description or 'Описание курса не заполнено' }}</p>
+    </div>
+    <div class="action-bar">
+        <span class="status-pill status-active"><i class="fas fa-tag"></i> {{ course.category or 'Категория не указана' }}</span>
+        <a href="{{ url_for('admin_edit_course', id=course.course_id) }}" class="btn btn-warning">
+            <i class="fas fa-pen"></i> Редактировать
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-list-check"></i> Задания курса</span>
+                <a href="{{ url_for('admin_add_assignment', course_id=course.course_id) }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus"></i> Добавить задание
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Задание</th>
+                                <th>Дедлайн</th>
+                                <th>Статусы курсантов</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assignment in assignments %}
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">{{ assignment.title }}</div>
+                                    <div class="text-muted small">{{ assignment.description or '-' }}</div>
+                                </td>
+                                <td>{{ assignment.deadline.strftime('%d.%m.%Y') if assignment.deadline else '-' }}</td>
+                                <td>
+                                    {% for status, label in status_labels.items() %}
+                                        {% if status == 'completed' %}
+                                            <span class="status-pill status-done me-1">{{ label }}: {{ progress_summary.get(assignment.assignment_id, {}).get(status, 0) }}</span>
+                                        {% elif status == 'in_progress' %}
+                                            <span class="status-pill status-active me-1">{{ label }}: {{ progress_summary.get(assignment.assignment_id, {}).get(status, 0) }}</span>
+                                        {% else %}
+                                            <span class="status-pill status-muted me-1">{{ label }}: {{ progress_summary.get(assignment.assignment_id, {}).get(status, 0) }}</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td class="text-nowrap">
+                                    <a href="{{ url_for('admin_edit_assignment', id=assignment.assignment_id) }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <form method="POST" action="{{ url_for('admin_delete_assignment', id=assignment.assignment_id) }}" class="d-inline" onsubmit="return confirm('Удалить задание?')">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4">Задания пока не добавлены</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-user-plus"></i> Назначить курс</div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin_assign_course', course_id=course.course_id) }}" class="d-flex gap-2">
+                    <select name="kursant_id" class="form-control" required>
+                        <option value="">Выберите курсанта</option>
+                        {% for student in available_students %}
+                            <option value="{{ student.kursant_id }}">{{ student.fullname }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary">Назначить</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="fas fa-users"></i> Назначенные курсанты</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Курсант</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for enrollment in enrollments %}
+                            <tr>
+                                <td>{{ enrollment.student.fullname }}</td>
+                                <td class="text-end">
+                                    <form method="POST" action="{{ url_for('admin_unassign_course', course_id=course.course_id, kursant_id=enrollment.kursant_id) }}" onsubmit="return confirm('Снять назначение курса?')">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-user-minus"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="2">Курс пока никому не назначен</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
